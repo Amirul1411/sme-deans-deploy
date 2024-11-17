@@ -1,0 +1,8 @@
+# Run backup every day at midnight
+0 0 * * * /scripts/backup.sh
+
+# Run backup every 6 hours
+0 */6 * * * /scripts/backup.sh
+
+# Run backup monitoring every hour
+0 * * * * /scripts/monitor.sh 
