@@ -1,0 +1,4 @@
+FROM python:3.8-slim
+WORKDIR /scripts
+COPY backup-scripts/monitor_backups.py .
+CMD ["python", "monitor_backups.py"] 
