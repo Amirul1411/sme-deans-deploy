@@ -1,8 +1,8 @@
-# Run backup every day at midnight
-0 0 * * * /scripts/backup.sh
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
-# Run backup every 6 hours
-0 */6 * * * /scripts/backup.sh
+# Run backup every hour
+0 * * * * /scripts/backup.sh >> /backups/cron.log 2>&1
 
-# Run backup monitoring every hour
-0 * * * * /scripts/monitor.sh 
+# Run monitoring every hour
+0 * * * * /scripts/monitor.sh >> /backups/cron.log 2>&1 
