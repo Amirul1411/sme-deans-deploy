@@ -1,23 +1,27 @@
 #!/bin/bash
 
-LOG_FILE="/backups/monitor.log"
+# Set variables
 BACKUP_DIR="/backups"
 
-# Get the latest backup file
-latest_backup=$(ls -t ${BACKUP_DIR}/backup_*.sql.gz 2>/dev/null | head -n1)
+# Check latest backup
+latest_backup=$(ls -t ${BACKUP_DIR}/backup_*.sql 2>/dev/null | head -n1)
 
 if [ -z "$latest_backup" ]; then
-    echo "$(date '+%Y-%m-%d %H:%M:%S') - ERROR - No backups found" >> $LOG_FILE
+    echo "[$(date)] No backups found!"
     exit 1
 fi
 
-# Check if the latest backup is less than 24 hours old
+# Get backup age in minutes
 backup_time=$(stat -c %Y "$latest_backup")
 current_time=$(date +%s)
-age_hours=$(( ($current_time - $backup_time) / 3600 ))
+backup_age=$(( (current_time - backup_time) / 60 ))
 
-if [ $age_hours -lt 24 ]; then
-    echo "$(date '+%Y-%m-%d %H:%M:%S') - INFO - Backup check passed. Latest backup: $(basename $latest_backup)" >> $LOG_FILE
-else
-    echo "$(date '+%Y-%m-%d %H:%M:%S') - WARNING - Latest backup is more than 24 hours old: $(basename $latest_backup)" >> $LOG_FILE
-fi 
+echo "[$(date)] Latest backup: $latest_backup (${backup_age} minutes old)"
+
+# Alert if backup is too old (more than 7 hours)
+if [ $backup_age -gt 420 ]; then
+    echo "[$(date)] WARNING: Latest backup is more than 7 hours old!"
+    exit 1
+fi
+
+exit 0 

@@ -122,14 +122,25 @@ services:
       - ./scripts:/scripts
       - ./backups:/backups
       - ./scripts/backup-crontab:/etc/cron.d/backup-crontab
-    command: >
+    entrypoint: >
       /bin/bash -c "
-        apt-get update && apt-get install -y cron &&
+        echo 'Starting container setup...' &&
+        apt-get update &&
+        apt-get install -y cron procps &&
+        mkdir -p /backups &&
+        touch /backups/cron.log &&
+        chmod -R 777 /backups &&
+        chmod -R 755 /scripts &&
         chmod 0644 /etc/cron.d/backup-crontab &&
-        crontab /etc/cron.d/backup-crontab &&
-        cron &&
-        tail -f /dev/null
+        chmod +x /scripts/*.sh &&
+        echo 'Installing crontab...' &&
+        cat /etc/cron.d/backup-crontab > /var/spool/cron/crontabs/root &&
+        chmod 600 /var/spool/cron/crontabs/root &&
+        echo 'Starting cron daemon...' &&
+        cron -f
       "
+    depends_on:
+      - db
     networks:
       - db_network
 
